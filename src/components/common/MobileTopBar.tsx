@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useSession } from "@/lib/authClient"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -10,15 +10,16 @@ export default function MobileTopBar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between border-b bg-background px-4 md:hidden">
-      <span className="text-lg font-bold tracking-tight">Void</span>
+      <Link to="/" className="text-lg font-bold tracking-tight">Void</Link>
 
       <div className="flex items-center gap-2">
         <ModeToggle />
         {session ? (
-          <Avatar className="h-8 w-8" onClick={() => navigate("/profile")}>
+          <Avatar className="h-8 w-8 cursor-pointer" onClick={() => navigate("/profile")}>
             <AvatarImage src={session.user.image ?? undefined} />
             <AvatarFallback>{session.user.name?.[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
+ 
         ) : (
           <Button size="sm" onClick={() => navigate("/login")}>
             Log in

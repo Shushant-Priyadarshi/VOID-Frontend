@@ -10,6 +10,11 @@ import Message from "@/pages/Message";
 import CreatePost from "@/pages/CreatePost";
 import Mentor from "@/pages/Mentor";
 import DetailPost from "@/pages/DetailPost";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import EmailVerificationSent from "./pages/EmailVerificationSent";
+import EmailVerified from "./pages/EmailVerified";
+import Profile from "./pages/Profile";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +32,7 @@ export const router = createBrowserRouter([
           { path: "/create-post", element: <CreatePost /> },
           { path: "/message", element: <Message /> },
           { path: "/post/:id", element: <DetailPost /> },
+          { path: "profile", element: <Profile /> },
         ],
       },
     ],
@@ -38,6 +44,10 @@ export const router = createBrowserRouter([
     children: [
       { path: "/login", element: <SignIn /> },
       { path: "/signup", element: <SignUp /> },
+      { path: "/forgot-password", element: <ForgotPassword /> },
+      { path: "/reset-password", element: <ResetPassword /> },
+      { path: "/email-verification-sent", element: <EmailVerificationSent /> },
+      { path: "/email-verified", element: <EmailVerified /> },
     ],
   },
 ]);

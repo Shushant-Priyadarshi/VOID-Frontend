@@ -31,6 +31,7 @@ export default function SignUp() {
       name: form.get("name") as string,
       email: form.get("email") as string,
       password,
+      callbackURL: `${import.meta.env.VITE_BASE_URL}/email-verified`
     })
 
     setLoading(false)
@@ -38,7 +39,7 @@ export default function SignUp() {
     if (error) {
       setError(error.message ?? "Signup failed")
     } else {
-      navigate("/")
+      navigate("/email-verification-sent")
     }
   }
 

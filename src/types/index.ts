@@ -6,11 +6,15 @@ export interface UserProfile {
   email: string
   bio: string | null
   profileImage: string | null
-  role: UserRole
-  college?: string | null
-  hospital?: string | null
+  role: "USER" | "MENTOR" | "ADMIN"
   emailVerified: boolean
   createdAt: string
+}
+
+export interface UpdateProfilePayload {
+  name?: string
+  bio?: string
+  profileImage?: string
 }
 
 export interface Post {
