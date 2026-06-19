@@ -1,0 +1,43 @@
+import { createBrowserRouter } from "react-router-dom";
+import AppLayout from "@/components/common/AppLayout";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
+import RedirectIfAuthed from "@/components/common/RedirectIfAuthed";
+import Home from "@/pages/Home";
+import SignIn from "@/pages/SignIn";
+import SignUp from "@/pages/SignUp";
+import Search from "@/pages/Search";
+import Message from "@/pages/Message";
+import CreatePost from "@/pages/CreatePost";
+import Mentor from "@/pages/Mentor";
+import DetailPost from "@/pages/DetailPost";
+
+export const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      // public — viewable by anyone
+      { path: "/", element: <Home /> },
+      { path: "/search", element: <Search /> },
+      { path: "/mentor-find", element: <Mentor /> },
+
+      // requires auth
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "/create-post", element: <CreatePost /> },
+          { path: "/message", element: <Message /> },
+          { path: "/post/:id", element: <DetailPost /> },
+        ],
+      },
+    ],
+  },
+
+  // auth pages — no shell, redirect away if already logged in
+  {
+    element: <RedirectIfAuthed />,
+    children: [
+      { path: "/login", element: <SignIn /> },
+      { path: "/signup", element: <SignUp /> },
+    ],
+  },
+]);
