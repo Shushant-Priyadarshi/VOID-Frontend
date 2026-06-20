@@ -1,5 +1,5 @@
 import { api } from "@/lib/api"
-import type { UserProfile, UpdateProfilePayload } from "@/types"
+import type { UserProfile, UpdateProfilePayload, PublicUserProfile } from "@/types"
 
 interface ApiEnvelope<T> {
   statusCode: number
@@ -16,4 +16,7 @@ export const userApi = {
   updateProfile: (payload: UpdateProfilePayload) => {
     return api.patch<ApiEnvelope<UserProfile>>("/api/v1/users/update-user-profile", payload)
   },
+
+  getPublicProfile: (userId: string) =>
+  api.get<ApiEnvelope<PublicUserProfile>>(`/api/v1/users/${userId}/public`),
 }

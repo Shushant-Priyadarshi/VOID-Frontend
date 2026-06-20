@@ -1,15 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { GraduationCap, Hospital } from "lucide-react"
-import type { UserProfile, UpdateProfileFn } from "@/types"
-import EditProfileDialog from "./EditProfileDialog"
+import type { PublicUserProfile } from "@/types"
 
 interface Props {
-  profile: UserProfile
-  onSave: UpdateProfileFn
+  profile: PublicUserProfile
 }
 
-export default function ProfileHeader({ profile, onSave }: Props) {
+export default function PublicProfileHeader({ profile }: Props) {
   return (
     <div className="flex flex-col items-center gap-3 border-b pb-6 pt-2 text-center">
       <Avatar className="h-20 w-20">
@@ -21,7 +19,6 @@ export default function ProfileHeader({ profile, onSave }: Props) {
 
       <div>
         <h1 className="text-lg font-semibold">{profile.name}</h1>
-        <p className="text-sm text-muted-foreground">{profile.email}</p>
       </div>
 
       {profile.bio && (
@@ -45,8 +42,6 @@ export default function ProfileHeader({ profile, onSave }: Props) {
           </Badge>
         )}
       </div>
-
-      <EditProfileDialog profile={profile} onSave={onSave} />
     </div>
   )
 }

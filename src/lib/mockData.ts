@@ -1,9 +1,10 @@
-import type { Post } from "@/types"
+import type { Post } from "@/types";
 
 export const mockPosts: Post[] = [
   {
     id: "1",
-    content: "Just finished my first suturing session in the OT. Hands were shaking but the resident said it's normal for the first few times. Any tips for staying calm during procedures?",
+    content:
+      "Just finished my first suturing session in the OT. Hands were shaking but the resident said it's normal for the first few times. Any tips for staying calm during procedures?",
     isAnonymous: false,
     createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     author: { id: "u1", name: "Aarav Mehta", profileImage: null },
@@ -13,7 +14,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "2",
-    content: "Is it normal to feel completely burnt out during clinical rotations? I love medicine but I haven't slept properly in weeks. Looking for advice from anyone who's been through this.",
+    content:
+      "Is it normal to feel completely burnt out during clinical rotations? I love medicine but I haven't slept properly in weeks. Looking for advice from anyone who's been through this.",
     isAnonymous: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
     author: null,
@@ -24,7 +26,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "3",
-    content: "Had a patient today thank me for explaining their diagnosis in a way they could actually understand. Small moments like these are why I chose this field.",
+    content:
+      "Had a patient today thank me for explaining their diagnosis in a way they could actually understand. Small moments like these are why I chose this field.",
     isAnonymous: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
     author: null,
@@ -35,7 +38,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "4",
-    content: "Just finished my first suturing session in the OT. Hands were shaking but the resident said it's normal for the first few times. Any tips for staying calm during procedures?",
+    content:
+      "Just finished my first suturing session in the OT. Hands were shaking but the resident said it's normal for the first few times. Any tips for staying calm during procedures?",
     isAnonymous: false,
     createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     author: { id: "u1", name: "Aarav Mehta", profileImage: null },
@@ -45,7 +49,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "5",
-    content: "Is it normal to feel completely burnt out during clinical rotations? I love medicine but I haven't slept properly in weeks. Looking for advice from anyone who's been through this.",
+    content:
+      "Is it normal to feel completely burnt out during clinical rotations? I love medicine but I haven't slept properly in weeks. Looking for advice from anyone who's been through this.",
     isAnonymous: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
     author: null,
@@ -56,7 +61,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "6",
-    content: "Had a patient today thank me for explaining their diagnosis in a way they could actually understand. Small moments like these are why I chose this field.",
+    content:
+      "Had a patient today thank me for explaining their diagnosis in a way they could actually understand. Small moments like these are why I chose this field.",
     isAnonymous: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
     author: null,
@@ -67,7 +73,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "7",
-    content: "Just finished my first suturing session in the OT. Hands were shaking but the resident said it's normal for the first few times. Any tips for staying calm during procedures?",
+    content:
+      "Just finished my first suturing session in the OT. Hands were shaking but the resident said it's normal for the first few times. Any tips for staying calm during procedures?",
     isAnonymous: false,
     createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     author: { id: "u1", name: "Aarav Mehta", profileImage: null },
@@ -77,7 +84,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "8",
-    content: "Is it normal to feel completely burnt out during clinical rotations? I love medicine but I haven't slept properly in weeks. Looking for advice from anyone who's been through this.",
+    content:
+      "Is it normal to feel completely burnt out during clinical rotations? I love medicine but I haven't slept properly in weeks. Looking for advice from anyone who's been through this.",
     isAnonymous: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
     author: null,
@@ -88,7 +96,8 @@ export const mockPosts: Post[] = [
   },
   {
     id: "9",
-    content: "Had a patient today thank me for explaining their diagnosis in a way they could actually understand. Small moments like these are why I chose this field.",
+    content:
+      "Had a patient today thank me for explaining their diagnosis in a way they could actually understand. Small moments like these are why I chose this field.",
     isAnonymous: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
     author: null,
@@ -97,4 +106,4 @@ export const mockPosts: Post[] = [
     commentCount: 12,
     likedByMe: false,
   },
-]
+];
