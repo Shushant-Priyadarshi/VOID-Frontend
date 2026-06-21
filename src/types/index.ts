@@ -83,3 +83,19 @@ export interface PublicUserProfile {
   hospital: string | null
   createdAt: string
 }
+
+export interface FollowCounts {
+  followers: number
+  following: number
+  isFollowing: boolean
+}
+
+export interface FollowUser {
+  id: string
+  name: string
+  profileImage: string | null
+  role: "USER" | "MENTOR" | "ADMIN"
+  college: string | null
+  hospital: string | null
+  isFollowedByMe: boolean
+}
