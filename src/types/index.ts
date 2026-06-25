@@ -99,3 +99,50 @@ export interface FollowUser {
   hospital: string | null
   isFollowedByMe: boolean
 }
+
+
+export type MentorCategory =
+  | "CARDIOLOGY"
+  | "NEUROLOGY"
+  | "ONCOLOGY"
+  | "PEDIATRICS"
+  | "ORTHOPEDICS"
+  | "DERMATOLOGY"
+  | "PSYCHIATRY"
+  | "GENERAL_MEDICINE"
+  | "SURGERY"
+  | "RADIOLOGY"
+  | "CAREER_GUIDANCE"
+  | "EXAM_PREPARATION"
+  | "OTHER"
+
+export interface MentorUser {
+  id: string
+  name: string
+  profileImage: string | null
+  bio: string | null
+  college: string | null
+  hospital: string | null
+}
+
+export interface MentorProfile {
+  id: string
+  userId: string
+  category: MentorCategory
+  specialization: string
+  experienceYears: number
+  organization: string | null
+  consultationFee: number | null
+  about: string | null
+  bookingUrl: string | null
+  user: MentorUser
+}
+
+export interface CreateMentorPayload {
+  category: MentorCategory
+  specialization: string
+  experienceYears: number
+  organization?: string
+  consultationFee?: number
+  about?: string
+}

@@ -16,6 +16,7 @@ import EmailVerificationSent from "./pages/EmailVerificationSent";
 import EmailVerified from "./pages/EmailVerified";
 import Profile from "./pages/Profile";
 import PublicProfile from "@/pages/PublicProfile"
+import MentorProfilePage from "@/pages/MentorProfile"
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
       { path: "/search", element: <Search /> },
       { path: "/mentor-find", element: <Mentor /> },
       { path: "/u/:id", element: <PublicProfile /> },
+      { path: "/mentor-find/:userId", element: <MentorProfilePage /> },
 
       // requires auth
       {
