@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { GraduationCap, Hospital } from "lucide-react"
 import type { UserProfile, UpdateProfileFn } from "@/types"
 import EditProfileDialog from "./EditProfileDialog"
+import {useSession} from "@/lib/authClient"
 
 interface Props {
   profile: UserProfile
@@ -10,10 +11,11 @@ interface Props {
 }
 
 export default function ProfileHeader({ profile, onSave }: Props) {
+  const session = useSession()
   return (
     <div className="flex flex-col items-center gap-3 border-b pb-6 pt-2 text-center">
       <Avatar className="h-20 w-20">
-        <AvatarImage src={profile.profileImage ?? undefined} />
+        <AvatarImage src={profile.profileImage || session.data?.user.image || undefined} />
         <AvatarFallback className="text-xl">
           {profile.name?.[0]?.toUpperCase()}
         </AvatarFallback>
