@@ -22,6 +22,7 @@ export interface UpdateProfilePayload {
 }
 export interface Post {
   id: string
+  title: string
   content: string
   isAnonymous: boolean
   createdAt: string
@@ -66,6 +67,7 @@ export interface Comment {
 }
 
 export interface CreatePostPayload {
+  title: string
   content: string
   isAnonymous: boolean
   imageUrl?: string

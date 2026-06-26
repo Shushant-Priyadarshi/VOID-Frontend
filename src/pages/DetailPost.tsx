@@ -94,7 +94,7 @@ function DetailPostContent({ postId }: { postId: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <PostCard post={post} onLikeToggle={handleLikeToggle} />
+      <PostCard post={post} onLikeToggle={handleLikeToggle} truncate={false} />
 
       <Separator />
 

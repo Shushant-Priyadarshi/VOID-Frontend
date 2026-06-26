@@ -7,15 +7,22 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useNavigate } from "react-router-dom";
 import { formatRelativeTime } from "@/lib/formatRelativeTime";
 import { Link } from "react-router-dom";
+import { truncateWords } from "@/lib/truncateWords";
 
 interface Props {
   post: Post;
   onLikeToggle: (postId: string) => void;
+  truncate?: boolean
 }
 
-export default function PostCard({ post, onLikeToggle }: Props) {
-  const { withAuth, promptOpen, setPromptOpen } = useRequireAuth();
-  const navigate = useNavigate();
+export default function PostCard({ post, onLikeToggle, truncate = true }: Props) {
+  const { withAuth, promptOpen, setPromptOpen } = useRequireAuth()
+  const navigate = useNavigate()
+
+  const { text: truncatedContent, isTruncated } = truncate
+    ? truncateWords(post.content, 30)
+    : { text: post.content, isTruncated: false }
+
 
   return (
     <article className="rounded-lg border bg-card p-4">
@@ -60,12 +67,18 @@ export default function PostCard({ post, onLikeToggle }: Props) {
         </div>
       </div>
 
-      <p
-        className="mt-3 cursor-pointer whitespace-pre-wrap text-sm leading-relaxed"
-        onClick={() => withAuth(() => navigate(`/post/${post.id}`))}
+      <div
+        onClick={truncate ? () => withAuth(() => navigate(`/post/${post.id}`)) : undefined}
+        className={cn("mt-3", truncate && "cursor-pointer")}
       >
-        {post.content}
-      </p>
+        <h3 className="font-bold leading-snug">{post.title}</h3>
+        <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+          {truncatedContent}
+          {isTruncated && (
+            <span className="ml-1 font-medium text-primary">Read more</span>
+          )}
+        </p>
+      </div>
 
       {!post.isAnonymous && post.imageUrl && (
         <img

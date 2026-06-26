@@ -1,13 +1,16 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { postApi } from "@/api/post.api"
 import PostTypeToggle from "@/components/page_components/create_post/PostTypeToggle"
 import ImageUploadField from "@/components/page_components/create_post/ImageUploadField"
 
 export default function CreatePost() {
   const navigate = useNavigate()
+  const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -16,11 +19,16 @@ export default function CreatePost() {
 
   function handleToggleAnonymous(value: boolean) {
     setIsAnonymous(value)
-    if (value) setImageFile(null)  // anonymous posts can't have images
+    if (value) setImageFile(null)
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    if (!title.trim()) {
+      setError("Post title can't be empty")
+      return
+    }
     if (!content.trim()) {
       setError("Post content can't be empty")
       return
@@ -30,10 +38,10 @@ export default function CreatePost() {
     setError("")
 
     try {
-      // TODO: when Cloudinary is added, upload imageFile here first and get a URL
-      const imageUrl = undefined
+      const imageUrl = undefined // TODO: Cloudinary upload
 
       await postApi.createPost({
+        title: title.trim(),
         content: content.trim(),
         isAnonymous,
         imageUrl,
@@ -54,6 +62,17 @@ export default function CreatePost() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <PostTypeToggle isAnonymous={isAnonymous} onToggle={handleToggleAnonymous} />
 
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="title">Title</Label>
+          <Input
+            id="title"
+            placeholder="Give your post a title..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={120}
+          />
+        </div>
+
         <Textarea
           placeholder={
             isAnonymous
@@ -72,7 +91,7 @@ export default function CreatePost() {
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        <Button type="submit" disabled={loading || !content.trim()} className="w-full">
+        <Button type="submit" disabled={loading || !title.trim() || !content.trim()} className="w-full">
           {loading ? "Posting..." : "Post"}
         </Button>
       </form>
