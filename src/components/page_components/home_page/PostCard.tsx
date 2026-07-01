@@ -1,28 +1,37 @@
-import { Heart, MessageCircle, GraduationCap } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { Post } from "@/types";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { useNavigate } from "react-router-dom";
-import { formatRelativeTime } from "@/lib/formatRelativeTime";
-import { Link } from "react-router-dom";
-import { truncateWords } from "@/lib/truncateWords";
+import { useState } from "react"
+import { Heart, MessageCircle, GraduationCap } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import type { Post } from "@/types"
+import { useRequireAuth } from "@/hooks/useRequireAuth"
+import { useNavigate, Link } from "react-router-dom"
+import { formatRelativeTime } from "@/lib/formatRelativeTime"
+import { truncateWords } from "@/lib/truncateWords"
+import AuthPromptDialog from "@/components/common/AuthPromptDialog"
+import PostImageGrid from "./PostImageGrid"
+import ImageLightbox from "./ImageLightbox"
 
 interface Props {
-  post: Post;
-  onLikeToggle: (postId: string) => void;
+  post: Post
+  onLikeToggle: (postId: string) => void
   truncate?: boolean
 }
 
 export default function PostCard({ post, onLikeToggle, truncate = true }: Props) {
   const { withAuth, promptOpen, setPromptOpen } = useRequireAuth()
   const navigate = useNavigate()
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
 
   const { text: truncatedContent, isTruncated } = truncate
     ? truncateWords(post.content, 30)
     : { text: post.content, isTruncated: false }
 
+  function handleImageClick(index: number) {
+    setLightboxIndex(index)
+    setLightboxOpen(true)
+  }
 
   return (
     <article className="rounded-lg border bg-card p-4">
@@ -34,15 +43,10 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
             </AvatarFallback>
           </Avatar>
         ) : (
-          <Link
-            to={`/u/${post.author?.id}`}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <Link to={`/u/${post.author?.id}`} onClick={(e) => e.stopPropagation()}>
             <Avatar className="h-9 w-9 transition-opacity hover:opacity-80">
-              <AvatarImage src={post.author?.profileImage ?? undefined} />
-              <AvatarFallback>
-                {post.author?.name?.[0]?.toUpperCase()}
-              </AvatarFallback>
+               <AvatarImage src={post.author?.profileImage  || post.author?.image ||  undefined} />
+              <AvatarFallback>{post.author?.name?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
           </Link>
         )}
@@ -60,34 +64,29 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
             </Link>
           )}
           <p className="text-xs text-muted-foreground">
-            {post.isAnonymous
-              ? post.anonymousLabel
-              : formatRelativeTime(post.createdAt)}
+            {post.isAnonymous ? post.anonymousLabel : formatRelativeTime(post.createdAt)}
           </p>
         </div>
       </div>
 
-      <div
-        onClick={truncate ? () => withAuth(() => navigate(`/post/${post.id}`)) : undefined}
-        className={cn("mt-3", truncate && "cursor-pointer")}
-      >
+      <div onClick={truncate ? () => withAuth(() => navigate(`/post/${post.id}`)) : undefined} className={cn("mt-3", truncate && "cursor-pointer")}>
         <h3 className="font-bold leading-snug">{post.title}</h3>
         <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
           {truncatedContent}
           {isTruncated && (
-            <span className="ml-1 font-medium text-primary">Read more</span>
+            <span className="ml-1 font-medium  text-blue-500">Read more</span>
           )}
+          
         </p>
       </div>
 
-      {!post.isAnonymous && post.imageUrl && (
-        <img
-          src={post.imageUrl}
-          alt="Post attachment"
-          className="mt-3 max-h-96 w-full rounded-lg object-cover"
+          {!post.isAnonymous && post.imageUrls.length > 0 && (
+        <PostImageGrid
+          imageUrls={post.imageUrls}
+          onImageClick={handleImageClick}
+          size={truncate ? "compact" : "full"}
         />
       )}
-
       <div className="mt-4 flex items-center gap-4 text-muted-foreground">
         <Button
           variant="ghost"
@@ -110,16 +109,16 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
         </Button>
       </div>
 
-      <AuthPromptDialogLazy open={promptOpen} onOpenChange={setPromptOpen} />
-    </article>
-  );
-}
+      <AuthPromptDialog open={promptOpen} onOpenChange={setPromptOpen} />
 
-// avoids re-importing in every card instance issue; simple direct import alias
-import AuthPromptDialog from "@/components/common/AuthPromptDialog";
-function AuthPromptDialogLazy(props: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-}) {
-  return <AuthPromptDialog {...props} />;
+      {post.imageUrls.length > 0 && (
+        <ImageLightbox
+          imageUrls={post.imageUrls}
+          initialIndex={lightboxIndex}
+          open={lightboxOpen}
+          onOpenChange={setLightboxOpen}
+        />
+      )}
+    </article>
+  )
 }

@@ -1,5 +1,6 @@
 export type UserRole = "USER" | "MENTOR" | "ADMIN"
 
+//User types
 export interface UserProfile {
   id: string
   name: string
@@ -20,33 +21,20 @@ export interface UpdateProfilePayload {
   college?: string
   hospital?: string
 }
-export interface Post {
-  id: string
-  title: string
-  content: string
-  isAnonymous: boolean
-  createdAt: string
-  author: {
-    id: string
-    name: string
-    profileImage: string | null
-  } | null              // null when anonymous
-  anonymousLabel?: string  // e.g. "Medical Student, AIIMS Delhi"
-  likeCount: number
-  commentCount: number
-  likedByMe: boolean
-}
 
+//Post types
 export interface PostAuthor {
   id: string
   name: string
   profileImage: string | null
+  image:string | null
 }
 
 export interface Post {
   id: string
+  title: string
   content: string
-  imageUrl?: string | null
+  imageUrls: string[]
   isAnonymous: boolean
   createdAt: string
   author: PostAuthor | null
@@ -56,6 +44,14 @@ export interface Post {
   likedByMe: boolean
 }
 
+export interface CreatePostPayload {
+  title: string
+  content: string
+  isAnonymous: boolean
+  imageUrls?: string[]
+}
+
+//Comment
 export interface Comment {
   id: string
   content: string
@@ -66,13 +62,8 @@ export interface Comment {
   replies: Comment[]
 }
 
-export interface CreatePostPayload {
-  title: string
-  content: string
-  isAnonymous: boolean
-  imageUrl?: string
-}
 
+//Profile
 export type UpdateProfileFn = (payload: UpdateProfilePayload) => Promise<UserProfile>
 
 export interface PublicUserProfile {
@@ -86,6 +77,7 @@ export interface PublicUserProfile {
   createdAt: string
 }
 
+//Follow
 export interface FollowCounts {
   followers: number
   following: number
@@ -102,7 +94,7 @@ export interface FollowUser {
   isFollowedByMe: boolean
 }
 
-
+//Categories
 export type MentorCategory =
   | "CARDIOLOGY"
   | "NEUROLOGY"
@@ -118,6 +110,7 @@ export type MentorCategory =
   | "EXAM_PREPARATION"
   | "OTHER"
 
+//Mentor
 export interface MentorUser {
   id: string
   name: string

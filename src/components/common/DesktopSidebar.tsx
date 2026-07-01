@@ -1,24 +1,25 @@
-import { Link, NavLink } from "react-router-dom";
-import { navItems } from "./nav-items";
-import { cn } from "@/lib/utils";
-import { useSession, signOut } from "@/lib/authClient";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ModeToggle } from "./mode-toggle";
-import { LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom"
+import { navItems } from "./nav-items"
+import { cn } from "@/lib/utils"
+import { useSession, signOut } from "@/lib/authClient"
+import { useProfile } from "@/context/useProfile"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ModeToggle } from "./mode-toggle"
+import { LogOut } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 export default function DesktopSidebar() {
-  const { data: session } = useSession();
-  const navigate = useNavigate();
+  const { data: session } = useSession()
+  const { profile } = useProfile()
+  const navigate = useNavigate()
 
   async function handleSignOut() {
-    const confirm = window.confirm("Do you want to loguot");
+    const confirm = window.confirm("Do you want to logout")
     if (confirm) {
-      await signOut();
-      navigate("/login");
+      await signOut()
+      navigate("/login")
     }
-    return
   }
 
   return (
@@ -35,9 +36,7 @@ export default function DesktopSidebar() {
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent",
-                isActive
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground",
+                isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
               )
             }
           >
@@ -56,7 +55,7 @@ export default function DesktopSidebar() {
           <div className="flex items-center gap-2 rounded-md px-2 py-2 hover:bg-accent">
             <Link className="cursor-pointer" to="/profile">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={session.user.image ?? undefined} />
+                <AvatarImage src={profile?.profileImage ?? session.user.image ?? undefined} />
                 <AvatarFallback>
                   {session.user.name?.[0]?.toUpperCase()}
                 </AvatarFallback>
@@ -84,5 +83,5 @@ export default function DesktopSidebar() {
         )}
       </div>
     </aside>
-  );
+  )
 }

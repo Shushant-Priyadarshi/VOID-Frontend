@@ -1,11 +1,13 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useSession } from "@/lib/authClient"
+import { useProfile } from "@/context/useProfile"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ModeToggle } from "./mode-toggle"
 
 export default function MobileTopBar() {
   const { data: session } = useSession()
+  const { profile } = useProfile()
   const navigate = useNavigate()
 
   return (
@@ -16,10 +18,9 @@ export default function MobileTopBar() {
         <ModeToggle />
         {session ? (
           <Avatar className="h-8 w-8 cursor-pointer" onClick={() => navigate("/profile")}>
-            <AvatarImage src={session.user.image ?? undefined} />
+            <AvatarImage src={profile?.profileImage ?? session.user.image ?? undefined} />
             <AvatarFallback>{session.user.name?.[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
- 
         ) : (
           <Button size="sm" onClick={() => navigate("/login")}>
             Log in

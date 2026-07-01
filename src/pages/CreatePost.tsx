@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { postApi } from "@/api/post.api"
+import { uploadApi } from "@/api/upload.api"
 import PostTypeToggle from "@/components/page_components/create_post/PostTypeToggle"
 import ImageUploadField from "@/components/page_components/create_post/ImageUploadField"
 
@@ -13,13 +14,13 @@ export default function CreatePost() {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [isAnonymous, setIsAnonymous] = useState(false)
-  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imageFiles, setImageFiles] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
   function handleToggleAnonymous(value: boolean) {
     setIsAnonymous(value)
-    if (value) setImageFile(null)
+    if (value) setImageFiles([])
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -38,13 +39,18 @@ export default function CreatePost() {
     setError("")
 
     try {
-      const imageUrl = undefined // TODO: Cloudinary upload
+      let imageUrls: string[] = []
+
+      if (!isAnonymous && imageFiles.length > 0) {
+        const res = await uploadApi.uploadPostImages(imageFiles)
+        imageUrls = res.data.urls
+      }
 
       await postApi.createPost({
         title: title.trim(),
         content: content.trim(),
         isAnonymous,
-        imageUrl,
+        imageUrls,
       })
 
       navigate("/")
@@ -86,7 +92,7 @@ export default function CreatePost() {
         />
 
         {!isAnonymous && (
-          <ImageUploadField onFileSelected={setImageFile} />
+          <ImageUploadField onFilesSelected={setImageFiles} />
         )}
 
         {error && <p className="text-sm text-destructive">{error}</p>}
