@@ -22,6 +22,16 @@ export interface UpdateProfilePayload {
   hospital?: string
 }
 
+export interface SearchUser {
+  id: string
+  name: string
+  profileImage: string | null
+  role: "USER" | "MENTOR" | "ADMIN"
+  college: string | null
+  hospital: string | null
+  bio: string | null
+}
+
 //Post types
 export interface PostAuthor {
   id: string

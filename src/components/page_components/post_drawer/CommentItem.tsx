@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatRelativeTime } from "@/lib/formatRelativeTime"
 import type { Comment } from "@/types"
-import CommentComposer from "./CommentComposer"
+import CommentComposer from "../post_drawer/CommentComposer"
 
 interface Props {
   comment: Comment

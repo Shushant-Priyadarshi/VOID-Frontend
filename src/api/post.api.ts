@@ -26,9 +26,9 @@ export const postApi = {
       `/api/v1/posts/${id}`
     ),
 
-  searchPosts: (query: string) =>
+  searchPosts: (query: string, filter: "latest" | "top" = "latest") =>
     api.get<ApiEnvelope<Post[]>>(
-      `/api/v1/posts/search?q=${encodeURIComponent(query)}`
+      `/api/v1/posts/search?q=${encodeURIComponent(query)}&filter=${filter}`
     ),
 
   toggleLike: (id: string) =>
@@ -55,5 +55,5 @@ export const postApi = {
     api.get<ApiEnvelope<Post[]>>("/api/v1/posts/mine/commented"),
 
   getPostsByUser: (userId: string) =>
-  api.get<ApiEnvelope<Post[]>>(`/api/v1/posts/by-user/${userId}`),
+    api.get<ApiEnvelope<Post[]>>(`/api/v1/posts/by-user/${userId}`),
 };

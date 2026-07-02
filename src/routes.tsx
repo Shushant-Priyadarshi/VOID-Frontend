@@ -9,7 +9,6 @@ import Search from "@/pages/Search";
 import Message from "@/pages/Message";
 import CreatePost from "@/pages/CreatePost";
 import Mentor from "@/pages/Mentor";
-import DetailPost from "@/pages/DetailPost";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import EmailVerificationSent from "./pages/EmailVerificationSent";
@@ -17,6 +16,7 @@ import EmailVerified from "./pages/EmailVerified";
 import Profile from "./pages/Profile";
 import PublicProfile from "@/pages/PublicProfile"
 import MentorProfilePage from "@/pages/MentorProfile"
+import Notifications from "./pages/Notifications";
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +28,7 @@ export const router = createBrowserRouter([
       { path: "/mentor-find", element: <Mentor /> },
       { path: "/u/:id", element: <PublicProfile /> },
       { path: "/mentor-find/:userId", element: <MentorProfilePage /> },
+      { path: "/notifications", element: <Notifications /> },
 
       // requires auth
       {
@@ -35,7 +36,6 @@ export const router = createBrowserRouter([
         children: [
           { path: "/create-post", element: <CreatePost /> },
           { path: "/message", element: <Message /> },
-          { path: "/post/:id", element: <DetailPost /> },
           { path: "profile", element: <Profile /> },
         ],
       },

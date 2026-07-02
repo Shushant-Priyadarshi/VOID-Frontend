@@ -1,5 +1,5 @@
 import { api } from "@/lib/api"
-import type { UserProfile, UpdateProfilePayload, PublicUserProfile } from "@/types"
+import type { UserProfile, UpdateProfilePayload, PublicUserProfile, SearchUser } from "@/types"
 
 interface ApiEnvelope<T> {
   statusCode: number
@@ -19,4 +19,7 @@ export const userApi = {
 
   getPublicProfile: (userId: string) =>
   api.get<ApiEnvelope<PublicUserProfile>>(`/api/v1/users/${userId}/public`),
+
+  searchUsers: (query: string) =>
+  api.get<ApiEnvelope<SearchUser[]>>(`/api/v1/users/search?q=${encodeURIComponent(query)}`),
 }

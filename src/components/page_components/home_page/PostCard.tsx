@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { Post } from "@/types"
 import { useRequireAuth } from "@/hooks/useRequireAuth"
-import { useNavigate, Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { formatRelativeTime } from "@/lib/formatRelativeTime"
 import { truncateWords } from "@/lib/truncateWords"
 import AuthPromptDialog from "@/components/common/AuthPromptDialog"
 import PostImageGrid from "./PostImageGrid"
 import ImageLightbox from "./ImageLightbox"
+import { usePostDrawer } from "@/hooks/usePostDrawer"
 
 interface Props {
   post: Post
@@ -20,7 +21,7 @@ interface Props {
 
 export default function PostCard({ post, onLikeToggle, truncate = true }: Props) {
   const { withAuth, promptOpen, setPromptOpen } = useRequireAuth()
-  const navigate = useNavigate()
+  const { openPost } = usePostDrawer()
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
@@ -28,13 +29,17 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
     ? truncateWords(post.content, 30)
     : { text: post.content, isTruncated: false }
 
+  function handlePostClick() {
+    withAuth(() => openPost(post.id))
+  }
+
   function handleImageClick(index: number) {
     setLightboxIndex(index)
     setLightboxOpen(true)
   }
 
   return (
-    <article className="rounded-lg border bg-card p-4">
+    <article className="rounded-lg border bg-card p-4 transition-colors">
       <div className="flex items-start gap-3">
         {post.isAnonymous ? (
           <Avatar className="h-9 w-9">
@@ -45,7 +50,7 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
         ) : (
           <Link to={`/u/${post.author?.id}`} onClick={(e) => e.stopPropagation()}>
             <Avatar className="h-9 w-9 transition-opacity hover:opacity-80">
-               <AvatarImage src={post.author?.profileImage  || post.author?.image ||  undefined} />
+              <AvatarImage src={post.author?.profileImage ?? undefined} />
               <AvatarFallback>{post.author?.name?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
           </Link>
@@ -69,24 +74,27 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
         </div>
       </div>
 
-      <div onClick={truncate ? () => withAuth(() => navigate(`/post/${post.id}`)) : undefined} className={cn("mt-3", truncate && "cursor-pointer")}>
+      <div
+        onClick={truncate ? handlePostClick : undefined}
+        className={cn("mt-3", truncate && "cursor-pointer")}
+      >
         <h3 className="font-bold leading-snug">{post.title}</h3>
-        <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+        <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed">
           {truncatedContent}
           {isTruncated && (
-            <span className="ml-1 font-medium  text-blue-500">Read more</span>
+            <span className="ml-1 font-medium text-primary">Read more</span>
           )}
-          
         </p>
       </div>
 
-          {!post.isAnonymous && post.imageUrls.length > 0 && (
+      {!post.isAnonymous && post.imageUrls.length > 0 && (
         <PostImageGrid
           imageUrls={post.imageUrls}
           onImageClick={handleImageClick}
           size={truncate ? "compact" : "full"}
         />
       )}
+
       <div className="mt-4 flex items-center gap-4 text-muted-foreground">
         <Button
           variant="ghost"
@@ -102,7 +110,7 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
           variant="ghost"
           size="sm"
           className="h-8 gap-1.5 px-2"
-          onClick={() => withAuth(() => navigate(`/post/${post.id}`))}
+          onClick={handlePostClick}
         >
           <MessageCircle className="h-4 w-4" />
           {post.commentCount}
