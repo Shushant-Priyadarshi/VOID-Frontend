@@ -19,6 +19,7 @@ import {
 import { LogOut, User, ChevronRight, Sun, Moon, Monitor } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useMessageContext } from "@/hooks/useMessageContext";
 
 export default function DesktopSidebar() {
   const { data: session } = useSession();
@@ -26,6 +27,7 @@ export default function DesktopSidebar() {
   const { setTheme, theme } = useTheme();
   const navigate = useNavigate();
   const { unreadCount } = useNotifications();
+  const { totalUnread } = useMessageContext();
 
   async function handleSignOut() {
     await signOut();
@@ -69,13 +71,18 @@ export default function DesktopSidebar() {
                   )}
                 />
                 {item.label}
-                {isActive && (
-                  <ChevronRight className="ml-auto h-3.5 w-3.5 text-primary" />
-                )}
                 {item.label === "Alerts" && unreadCount > 0 && (
                   <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
+                )}
+                {item.label === "Messages" && totalUnread > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                    {totalUnread > 99 ? "99+" : totalUnread}
+                  </span>
+                )}
+                {isActive && unreadCount === 0 && totalUnread === 0 && (
+                  <ChevronRight className="ml-auto h-3.5 w-3.5 text-primary" />
                 )}
               </>
             )}

@@ -152,6 +152,18 @@ export interface CreateMentorPayload {
   about?: string
 }
 
+
+
+// WebSocket message shapes
+export type WSMessage =
+  | { type: "UNREAD_COUNT"; data: { count: number } }
+  | { type: "NEW_NOTIFICATION"; data: { notification: AppNotification; unreadCount: number } }
+  | { type: "NEW_MESSAGE"; data: { conversationId: string; message: Message } }
+  | { type: "MESSAGE_DELIVERED"; data: { conversationId: string; messageId: string } }
+  | { type: "MESSAGE_READ"; data: { conversationId: string } }
+  | { type: "TYPING"; data: { conversationId: string; userId: string; isTyping: boolean } }
+  | { type: "TOTAL_UNREAD_MESSAGES"; data: { count: number } }
+
 //notifications 
 export type NotificationType = "LIKE" | "COMMENT" | "FOLLOW"
 
@@ -171,7 +183,39 @@ export interface AppNotification {
   comment: { id: string; content: string } | null
 }
 
-// WebSocket message shapes
-export type WSMessage =
-  | { type: "UNREAD_COUNT"; data: { count: number } }
-  | { type: "NEW_NOTIFICATION"; data: { notification: AppNotification; unreadCount: number } }
+
+// Message
+
+export type MessageStatus = "SENT" | "DELIVERED" | "READ"
+
+export interface MessageSender {
+  id: string
+  name: string
+  profileImage: string | null
+}
+
+export interface Message {
+  id: string
+  conversationId: string
+  senderId: string
+  sender: MessageSender
+  content: string
+  status: MessageStatus
+  createdAt: string
+}
+
+export interface ConversationParticipant {
+  id: string
+  name: string
+  profileImage: string | null
+  role: "USER" | "MENTOR" | "ADMIN"
+}
+
+export interface Conversation {
+  id: string
+  otherUser: ConversationParticipant
+  lastMessagePreview: string | null
+  lastMessageAt: string
+  unreadCount: number
+  lastMessage: Message | null
+}

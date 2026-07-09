@@ -1,62 +1,80 @@
-import { useParams, Navigate } from "react-router-dom"
-import { usePublicProfile } from "@/hooks/usePublicProfile"
-import { useFollowCounts } from "@/hooks/useFollowCounts"
-import { useSession } from "@/lib/authClient"
-import { postApi } from "@/api/post.api"
-import PublicProfileHeader from "@/components/page_components/public_profile/PublicProfileHeader"
-import ProfileSkeleton from "@/components/page_components/profile_page/ProfileSkeleton"
-import PostCard from "@/components/page_components/home_page/PostCard"
-import FollowButton from "@/components/page_components/follow/FollowButton"
-import FollowStats from "@/components/page_components/follow/FollowStats"
+import { useParams, Navigate } from "react-router-dom";
+import { usePublicProfile } from "@/hooks/usePublicProfile";
+import { useFollowCounts } from "@/hooks/useFollowCounts";
+import { useSession } from "@/lib/authClient";
+import { postApi } from "@/api/post.api";
+import PublicProfileHeader from "@/components/page_components/public_profile/PublicProfileHeader";
+import ProfileSkeleton from "@/components/page_components/profile_page/ProfileSkeleton";
+import PostCard from "@/components/page_components/home_page/PostCard";
+import FollowStats from "@/components/page_components/follow/FollowStats";
+import PublicProfileActions from "@/components/page_components/public_profile/PublicProfileActions";
 
 export default function PublicProfile() {
-  const { id } = useParams<{ id: string }>()
-  const { data: session } = useSession()
+  const { id } = useParams<{ id: string }>();
+  const { data: session } = useSession();
 
   if (!id) {
-    return <p className="text-sm text-destructive">Invalid profile URL</p>
+    return <p className="text-sm text-destructive">Invalid profile URL</p>;
   }
 
   if (session?.user.id === id) {
-    return <Navigate to="/profile" replace />
+    return <Navigate to="/profile" replace />;
   }
 
-  return <PublicProfileContent userId={id} />
+  return <PublicProfileContent userId={id} />;
 }
 
 function PublicProfileContent({ userId }: { userId: string }) {
-  const { profile, posts, setPosts, loading, error } = usePublicProfile(userId)
-  const { counts, setCounts } = useFollowCounts(userId)
+  const { profile, posts, setPosts, loading, error } = usePublicProfile(userId);
+  const { counts, setCounts } = useFollowCounts(userId);
 
   function handleLikeToggle(postId: string) {
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId
-          ? { ...p, likedByMe: !p.likedByMe, likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1 }
-          : p
-      )
-    )
+          ? {
+              ...p,
+              likedByMe: !p.likedByMe,
+              likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+            }
+          : p,
+      ),
+    );
     postApi.toggleLike(postId).catch(() => {
       setPosts((prev) =>
         prev.map((p) =>
           p.id === postId
-            ? { ...p, likedByMe: !p.likedByMe, likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1 }
-            : p
-        )
-      )
-    })
+            ? {
+                ...p,
+                likedByMe: !p.likedByMe,
+                likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+              }
+            : p,
+        ),
+      );
+    });
   }
 
   function handleFollowChange(isFollowing: boolean) {
     setCounts((prev) =>
-      prev ? { ...prev, followers: isFollowing ? prev.followers + 1 : prev.followers - 1, isFollowing } : prev
-    )
+      prev
+        ? {
+            ...prev,
+            followers: isFollowing ? prev.followers + 1 : prev.followers - 1,
+            isFollowing,
+          }
+        : prev,
+    );
   }
 
-  if (loading) return <ProfileSkeleton />
+  if (loading) return <ProfileSkeleton />;
 
   if (error || !profile) {
-    return <p className="text-center text-sm text-destructive">{error || "User not found"}</p>
+    return (
+      <p className="text-center text-sm text-destructive">
+        {error || "User not found"}
+      </p>
+    );
   }
 
   return (
@@ -66,11 +84,15 @@ function PublicProfileContent({ userId }: { userId: string }) {
 
         {counts && (
           <>
-            <FollowStats userId={userId} followers={counts.followers} following={counts.following} />
-            <FollowButton
+            <FollowStats
               userId={userId}
-              initialIsFollowing={counts.isFollowing}
-              onChange={handleFollowChange}
+              followers={counts.followers}
+              following={counts.following}
+            />
+            <PublicProfileActions
+              userId={userId}
+              counts={counts}
+              onFollowChange={handleFollowChange}
             />
           </>
         )}
@@ -80,15 +102,21 @@ function PublicProfileContent({ userId }: { userId: string }) {
         <h2 className="mb-3 text-sm font-semibold">Posts</h2>
 
         {posts.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">No posts yet.</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            No posts yet.
+          </p>
         ) : (
           <div className="flex flex-col gap-3">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
+              <PostCard
+                key={post.id}
+                post={post}
+                onLikeToggle={handleLikeToggle}
+              />
             ))}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
