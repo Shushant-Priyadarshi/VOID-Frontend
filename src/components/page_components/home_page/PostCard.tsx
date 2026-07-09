@@ -82,7 +82,7 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
         <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed">
           {truncatedContent}
           {isTruncated && (
-            <span className="ml-1 font-medium text-primary">Read more</span>
+            <span className="ml-1 font-medium text-blue-500">Read more</span>
           )}
         </p>
       </div>
