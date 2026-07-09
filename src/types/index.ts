@@ -151,3 +151,27 @@ export interface CreateMentorPayload {
   consultationFee?: number
   about?: string
 }
+
+//notifications 
+export type NotificationType = "LIKE" | "COMMENT" | "FOLLOW"
+
+export interface NotificationActor {
+  id: string
+  name: string
+  profileImage: string | null
+}
+
+export interface AppNotification {
+  id: string
+  type: NotificationType
+  read: boolean
+  createdAt: string
+  actor: NotificationActor
+  post: { id: string; title: string } | null
+  comment: { id: string; content: string } | null
+}
+
+// WebSocket message shapes
+export type WSMessage =
+  | { type: "UNREAD_COUNT"; data: { count: number } }
+  | { type: "NEW_NOTIFICATION"; data: { notification: AppNotification; unreadCount: number } }

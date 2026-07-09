@@ -1,10 +1,10 @@
-import { NavLink, Link, useNavigate } from "react-router-dom"
-import { navItems } from "./nav-items"
-import { cn } from "@/lib/utils"
-import { useSession, signOut } from "@/lib/authClient"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useTheme } from "@/components/ui/theme-provider"
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { navItems } from "./nav-items";
+import { cn } from "@/lib/utils";
+import { useSession, signOut } from "@/lib/authClient";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTheme } from "@/components/ui/theme-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,26 +15,21 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-} from "@/components/ui/dropdown-menu"
-import {
-  LogOut,
-  User,
-  ChevronRight,
-  Sun,
-  Moon,
-  Monitor,
-} from "lucide-react"
-import { useProfile } from "@/hooks/useProfile"
+} from "@/components/ui/dropdown-menu";
+import { LogOut, User, ChevronRight, Sun, Moon, Monitor } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export default function DesktopSidebar() {
-  const { data: session } = useSession()
-  const { profile } = useProfile()
-  const { setTheme, theme } = useTheme()
-  const navigate = useNavigate()
+  const { data: session } = useSession();
+  const { profile } = useProfile();
+  const { setTheme, theme } = useTheme();
+  const navigate = useNavigate();
+  const { unreadCount } = useNotifications();
 
   async function handleSignOut() {
-    await signOut()
-    navigate("/login")
+    await signOut();
+    navigate("/login");
   }
 
   return (
@@ -61,7 +56,7 @@ export default function DesktopSidebar() {
                 "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )
             }
           >
@@ -70,12 +65,17 @@ export default function DesktopSidebar() {
                 <item.icon
                   className={cn(
                     "h-4 w-4 shrink-0 transition-colors",
-                    isActive && "text-primary"
+                    isActive && "text-primary",
                   )}
                 />
                 {item.label}
                 {isActive && (
                   <ChevronRight className="ml-auto h-3.5 w-3.5 text-primary" />
+                )}
+                {item.label === "Alerts" && unreadCount > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
                 )}
               </>
             )}
@@ -91,7 +91,9 @@ export default function DesktopSidebar() {
               <button className="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left transition-colors hover:bg-accent">
                 <Avatar className="h-8 w-8 shrink-0">
                   <AvatarImage
-                    src={profile?.profileImage ?? session.user.image ?? undefined}
+                    src={
+                      profile?.profileImage ?? session.user.image ?? undefined
+                    }
                   />
                   <AvatarFallback className="text-xs">
                     {session.user.name?.[0]?.toUpperCase()}
@@ -192,5 +194,5 @@ export default function DesktopSidebar() {
         )}
       </div>
     </aside>
-  )
+  );
 }

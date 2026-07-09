@@ -3,6 +3,7 @@ import { router } from "@/routes";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import { ProfileProvider } from "@/context/ProfileContext";
 import { PostDrawerProvider } from "./context/PostDrawerContext";
+import { NotificationProvider } from "@/context/NotificationProvider";
 
 export default function App() {
   return (
@@ -10,7 +11,9 @@ export default function App() {
       {" "}
       <ProfileProvider>
         <PostDrawerProvider>
-          <RouterProvider router={router} />
+          <NotificationProvider>
+            <RouterProvider router={router} />
+          </NotificationProvider>
         </PostDrawerProvider>
       </ProfileProvider>
     </ThemeProvider>
