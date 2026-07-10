@@ -165,7 +165,7 @@ export default function ChatWindow({ conversation, onBack, isTyping, incomingMes
       </div>
 
       {/* Fix: remove `ref` from ScrollArea — it doesn't forward refs */}
-      <ScrollArea className="flex-1 px-4 py-3">
+      <ScrollArea className="flex-1 min-h-0 px-4 py-3">
         {hasMore && !loading && (
           <Button variant="ghost" size="sm" className="mb-3 w-full text-xs" onClick={loadMore}>
             Load older messages

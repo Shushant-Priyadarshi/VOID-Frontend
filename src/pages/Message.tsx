@@ -70,7 +70,7 @@ export default function MessagePage() {
       {/* Left — conversation list */}
       <div
         className={cn(
-          "flex w-full flex-col border-r md:w-80 md:shrink-0",
+          "flex w-full min-h-0 flex-col border-r md:w-80 md:shrink-0",
           mobileView === "chat" ? "hidden md:flex" : "flex"
         )}
       >
@@ -90,7 +90,7 @@ export default function MessagePage() {
       {/* Right — chat window */}
       <div
         className={cn(
-          "flex flex-1 flex-col",
+          "flex min-h-0 flex-1 flex-col",
           mobileView === "list" ? "hidden md:flex" : "flex"
         )}
       >
