@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
       { path: "/mentor-find", element: <Mentor /> },
       { path: "/u/:id", element: <PublicProfile /> },
       { path: "/mentor-find/:userId", element: <MentorProfilePage /> },
-      { path: "/notifications", element: <Notifications /> },
+      
 
       // requires auth
       {
@@ -37,6 +37,7 @@ export const router = createBrowserRouter([
           { path: "/create-post", element: <CreatePost /> },
           { path: "/message", element: <Message /> },
           { path: "profile", element: <Profile /> },
+          { path: "/notifications", element: <Notifications /> },
         ],
       },
     ],
