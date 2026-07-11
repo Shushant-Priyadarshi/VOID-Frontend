@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Heart, MessageCircle, GraduationCap } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { Post } from "@/types"
 import { useRequireAuth } from "@/hooks/useRequireAuth"
@@ -39,82 +38,96 @@ export default function PostCard({ post, onLikeToggle, truncate = true }: Props)
   }
 
   return (
-    <article className="rounded-lg border bg-card p-4 transition-colors">
-      <div className="flex items-start gap-3">
-        {post.isAnonymous ? (
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="bg-muted">
-              <GraduationCap className="h-4 w-4 text-muted-foreground" />
-            </AvatarFallback>
-          </Avatar>
-        ) : (
-          <Link to={`/u/${post.author?.id}`} onClick={(e) => e.stopPropagation()}>
-            <Avatar className="h-9 w-9 transition-opacity hover:opacity-80">
-              <AvatarImage src={post.author?.profileImage ?? undefined} />
-              <AvatarFallback>{post.author?.name?.[0]?.toUpperCase()}</AvatarFallback>
-            </Avatar>
-          </Link>
-        )}
-
-        <div className="min-w-0 flex-1">
+    <article className="group rounded-xl border border-border/60 bg-card transition-colors hover:border-border">
+      <div className="p-4">
+        {/* Author row */}
+        <div className="flex items-start gap-2.5">
           {post.isAnonymous ? (
-            <p className="text-sm font-medium leading-tight">Anonymous</p>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+              <GraduationCap className="h-4 w-4 text-muted-foreground" />
+            </div>
           ) : (
-            <Link
-              to={`/u/${post.author?.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="text-sm font-medium leading-tight hover:underline"
-            >
-              {post.author?.name}
+            <Link to={`/u/${post.author?.id}`} onClick={(e) => e.stopPropagation()}>
+              <Avatar className="h-9 w-9 shrink-0 transition-opacity hover:opacity-80">
+                <AvatarImage src={post.author?.profileImage ?? undefined} />
+                <AvatarFallback className="text-xs font-medium">
+                  {post.author?.name?.[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             </Link>
           )}
-          <p className="text-xs text-muted-foreground">
-            {post.isAnonymous ? post.anonymousLabel : formatRelativeTime(post.createdAt)}
+
+          <div className="min-w-0 flex-1">
+            {post.isAnonymous ? (
+              <p className="text-sm font-semibold leading-tight text-foreground">Anonymous</p>
+            ) : (
+              <Link
+                to={`/u/${post.author?.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-sm font-semibold leading-tight text-foreground hover:underline underline-offset-2"
+              >
+                {post.author?.name}
+              </Link>
+            )}
+            <p className="mt-0.5 text-xs text-muted-foreground/70 leading-none">
+              {post.isAnonymous ? post.anonymousLabel : formatRelativeTime(post.createdAt)}
+            </p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div
+          onClick={truncate ? handlePostClick : undefined}
+          className={cn("mt-3", truncate && "cursor-pointer")}
+        >
+          <h3 className="text-sm font-bold leading-snug tracking-tight text-foreground">
+            {post.title}
+          </h3>
+          <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
+            {truncatedContent}
+            {isTruncated && (
+              <button
+                onClick={handlePostClick}
+                className="ml-1 text-sm font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300"
+              >
+                Read more
+              </button>
+            )}
           </p>
         </div>
-      </div>
 
-      <div
-        onClick={truncate ? handlePostClick : undefined}
-        className={cn("mt-3", truncate && "cursor-pointer")}
-      >
-        <h3 className="font-bold leading-snug">{post.title}</h3>
-        <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed">
-          {truncatedContent}
-          {isTruncated && (
-            <span className="ml-1 font-medium text-blue-500">Read more</span>
-          )}
-        </p>
-      </div>
+        {/* Images */}
+        {!post.isAnonymous && post.imageUrls.length > 0 && (
+          <PostImageGrid
+            imageUrls={post.imageUrls}
+            onImageClick={handleImageClick}
+            size={truncate ? "compact" : "full"}
+          />
+        )}
 
-      {!post.isAnonymous && post.imageUrls.length > 0 && (
-        <PostImageGrid
-          imageUrls={post.imageUrls}
-          onImageClick={handleImageClick}
-          size={truncate ? "compact" : "full"}
-        />
-      )}
+        {/* Action bar */}
+        <div className="mt-3 flex items-center gap-0.5 border-t border-border/40 pt-3">
+          <button
+            onClick={() => withAuth(() => onLikeToggle(post.id))}
+            className={cn(
+              "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
+              post.likedByMe
+                ? "text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
+            <Heart className={cn("h-4 w-4", post.likedByMe && "fill-current")} />
+            <span className="tabular-nums">{post.likeCount}</span>
+          </button>
 
-      <div className="mt-4 flex items-center gap-4 text-muted-foreground">
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn("h-8 gap-1.5 px-2", post.likedByMe && "text-rose-500")}
-          onClick={() => withAuth(() => onLikeToggle(post.id))}
-        >
-          <Heart className={cn("h-4 w-4", post.likedByMe && "fill-current")} />
-          {post.likeCount}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-1.5 px-2"
-          onClick={handlePostClick}
-        >
-          <MessageCircle className="h-4 w-4" />
-          {post.commentCount}
-        </Button>
+          <button
+            onClick={handlePostClick}
+            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="tabular-nums">{post.commentCount}</span>
+          </button>
+        </div>
       </div>
 
       <AuthPromptDialog open={promptOpen} onOpenChange={setPromptOpen} />

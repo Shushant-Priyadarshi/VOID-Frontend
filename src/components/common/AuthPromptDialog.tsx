@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
@@ -19,21 +18,34 @@ export default function AuthPromptDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Sign in to continue</DialogTitle>
-          <DialogDescription>
-            Create an account or log in to like, comment, and connect with mentors.
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-teal-50 dark:bg-teal-950/40">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <rect x="7" y="2" width="2" height="12" rx="0.5" fill="currentColor" className="text-teal-600 dark:text-teal-400" />
+              <rect x="2" y="7" width="12" height="2" rx="0.5" fill="currentColor" className="text-teal-600 dark:text-teal-400" />
+            </svg>
+          </div>
+          <DialogTitle className="text-base font-bold">Join the conversation</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Sign in to like posts, leave comments, and connect with doctors and medical students.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => navigate("/signup")}>
-            Create account
+        <div className="flex flex-col gap-2 pt-1">
+          <Button
+            onClick={() => { navigate("/signup"); onOpenChange(false) }}
+            className="h-10 w-full bg-teal-600 text-white hover:bg-teal-700 dark:bg-teal-600 dark:hover:bg-teal-500"
+          >
+            Create a free account
           </Button>
-          <Button onClick={() => navigate("/login")}>
-            Log in
+          <Button
+            variant="outline"
+            onClick={() => { navigate("/login"); onOpenChange(false) }}
+            className="h-10 w-full border-border/60"
+          >
+            Sign in
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )

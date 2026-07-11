@@ -4,54 +4,33 @@ import { useSession } from "@/lib/authClient"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import ConversationList from "@/components/page_components/messages/ConversationList"
 import ChatWindow from "@/components/page_components/messages/ChatWindow"
-import { MessageSquare } from "lucide-react"
+import { MessageSquareDashed } from "lucide-react"
 import type { Conversation, Message } from "@/types"
 import { cn } from "@/lib/utils"
 import { useSearchParams } from "react-router-dom"
 
 export default function MessagePage() {
   const { data: session } = useSession()
-  const {
-    conversations,
-    fetchConversations,
-    setActiveConversationId,
-    typingConversations,
-  } = useMessageContext()
-
+  const { conversations, fetchConversations, setActiveConversationId, typingConversations } = useMessageContext()
   const [activeConv, setActiveConv] = useState<Conversation | null>(null)
   const [mobileView, setMobileView] = useState<"list" | "chat">("list")
   const [searchParams] = useSearchParams()
   const convIdFromUrl = searchParams.get("conv")
 
-  // The context keeps each conversation's lastMessage up to date in real time.
-  // Derive the latest message for the open chat during render (no effect/setState
-  // needed) and hand it to ChatWindow, which appends it if it's new.
   const activeConvLive = activeConv
     ? conversations.find((c) => c.id === activeConv.id) ?? null
     : null
   const incomingMessage: Message | null = activeConvLive?.lastMessage ?? null
 
-  useEffect(() => {
-    fetchConversations()
-  }, [fetchConversations])
+  useEffect(() => { fetchConversations() }, [fetchConversations])
 
-  // Fix: derive active conversation from URL param without synchronous setState in effect
-  // Using a separate flag so we only auto-select once, not on every conversations change
   const didAutoSelect = useRef(false)
   useEffect(() => {
     if (!convIdFromUrl || conversations.length === 0 || didAutoSelect.current) return
     const conv = conversations.find((c) => c.id === convIdFromUrl)
     if (!conv) return
     didAutoSelect.current = true
-
-    // Wrap in setTimeout(0) to defer out of the effect's synchronous execution
-    // This satisfies React's rule about not calling setState synchronously
-    // in an effect that also runs other side effects
-    const id = window.setTimeout(() => {
-      setActiveConv(conv)
-      setMobileView("chat")
-    }, 0)
-
+    const id = window.setTimeout(() => { setActiveConv(conv); setMobileView("chat") }, 0)
     return () => window.clearTimeout(id)
   }, [convIdFromUrl, conversations])
 
@@ -60,40 +39,31 @@ export default function MessagePage() {
     return () => setActiveConversationId(null)
   }, [activeConv, setActiveConversationId])
 
-  function handleSelectConversation(conv: Conversation) {
-    setActiveConv(conv)
-    setMobileView("chat")
-  }
-
   return (
     <div className="-mx-4 -my-6 flex h-[calc(100vh-3.5rem)] overflow-hidden md:h-screen">
-      {/* Left — conversation list */}
-      <div
-        className={cn(
-          "flex w-full min-h-0 flex-col border-r md:w-80 md:shrink-0",
-          mobileView === "chat" ? "hidden md:flex" : "flex"
-        )}
-      >
-        <div className="flex h-14 items-center border-b px-4">
-          <p className="text-base font-bold">Messages</p>
+      {/* Left panel */}
+      <div className={cn(
+        "flex min-h-0 w-full flex-col border-r bg-background md:w-80 md:shrink-0",
+        mobileView === "chat" ? "hidden md:flex" : "flex"
+      )}>
+        <div className="flex h-14 shrink-0 items-center border-b px-5">
+          <h1 className="text-base font-bold tracking-tight text-foreground">Messages</h1>
         </div>
         <ScrollArea className="flex-1">
           <ConversationList
             conversations={conversations}
             activeId={activeConv?.id ?? null}
             currentUserId={session?.user.id ?? ""}
-            onSelect={handleSelectConversation}
+            onSelect={(conv) => { setActiveConv(conv); setMobileView("chat") }}
           />
         </ScrollArea>
       </div>
 
-      {/* Right — chat window */}
-      <div
-        className={cn(
-          "flex min-h-0 flex-1 flex-col",
-          mobileView === "list" ? "hidden md:flex" : "flex"
-        )}
-      >
+      {/* Right panel */}
+      <div className={cn(
+        "flex min-h-0 flex-1 flex-col bg-background",
+        mobileView === "list" ? "hidden md:flex" : "flex"
+      )}>
         {activeConv ? (
           <ChatWindow
             key={activeConv.id}
@@ -103,12 +73,16 @@ export default function MessagePage() {
             incomingMessage={incomingMessage}
           />
         ) : (
-          <div className="hidden h-full flex-col items-center justify-center gap-3 text-center md:flex">
-            <MessageSquare className="h-12 w-12 text-muted-foreground/30" />
-            <p className="text-sm font-medium">Your messages</p>
-            <p className="text-xs text-muted-foreground">
-              Select a conversation or visit someone's profile to start chatting.
-            </p>
+          <div className="hidden h-full flex-col items-center justify-center gap-4 text-center md:flex">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+              <MessageSquareDashed className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-foreground">Your messages</p>
+              <p className="max-w-[200px] text-xs text-muted-foreground">
+                Select a conversation or visit a profile to start chatting.
+              </p>
+            </div>
           </div>
         )}
       </div>

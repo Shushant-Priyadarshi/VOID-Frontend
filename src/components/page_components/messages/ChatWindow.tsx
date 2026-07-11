@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowLeft, Send } from "lucide-react"
 import { messageApi } from "@/api/message.api"
@@ -17,7 +16,7 @@ interface Props {
   conversation: Conversation
   onBack?: () => void
   isTyping: boolean
-  incomingMessage: Message | null  // ← parent passes new WS messages via prop
+  incomingMessage: Message | null
 }
 
 export default function ChatWindow({ conversation, onBack, isTyping, incomingMessage }: Props) {
@@ -33,12 +32,8 @@ export default function ChatWindow({ conversation, onBack, isTyping, incomingMes
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  // ChatWindow is remounted per conversation (keyed on conversation.id in the parent),
-  // so state starts fresh on mount — no synchronous resets needed here. Only the async
-  // load lives in the effect; its setState calls run after the await, off the render path.
   useEffect(() => {
     let cancelled = false
-
     async function load() {
       try {
         const res = await messageApi.getMessages(conversation.id)
@@ -51,61 +46,39 @@ export default function ChatWindow({ conversation, onBack, isTyping, incomingMes
         if (!cancelled) setLoading(false)
       }
     }
-
     load()
     messageApi.markRead(conversation.id).catch(console.error)
-
     return () => { cancelled = true }
   }, [conversation.id])
 
-  // Append messages streamed in over the WebSocket (delivered via the incomingMessage
-  // prop). This accumulates external, non-render-derivable data into local state — the
-  // legitimate "subscribe to an external system, then setState" case for this effect.
   useEffect(() => {
     if (!incomingMessage) return
     if (incomingMessage.conversationId !== conversation.id) return
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing external WS stream into local list
     setMessages((prev) => {
-      // deduplicate — don't add if already present (e.g. own sent message)
       if (prev.some((m) => m.id === incomingMessage.id)) return prev
       return [...prev, incomingMessage]
     })
   }, [incomingMessage, conversation.id])
 
-  // Apply delivered/seen receipts to my own messages in the open window.
-  // Read receipts are conversation-level, so this is coarse by design:
-  // READ marks all my not-yet-read messages read; DELIVERED bumps my sent ones.
   useEffect(() => {
     if (!statusEvent) return
     if (statusEvent.conversationId !== conversation.id) return
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- applying external WS receipt to local list
     setMessages((prev) =>
       prev.map((m) => {
         if (m.senderId !== currentUserId) return m
-        if (statusEvent.status === "READ" && m.status !== "READ") {
-          return { ...m, status: "READ" }
-        }
-        if (statusEvent.status === "DELIVERED" && m.status === "SENT") {
-          return { ...m, status: "DELIVERED" }
-        }
+        if (statusEvent.status === "READ" && m.status !== "READ") return { ...m, status: "READ" }
+        if (statusEvent.status === "DELIVERED" && m.status === "SENT") return { ...m, status: "DELIVERED" }
         return m
       })
     )
   }, [statusEvent, conversation.id, currentUserId])
 
-  // Scroll to bottom on new messages
   useEffect(() => {
-    if (!loading) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-    }
+    if (!loading) bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages.length, loading])
 
   const stopTyping = useDebouncedCallback(() => {
-    messageApi
-      .sendTyping(conversation.id, false, conversation.otherUser.id)
-      .catch(console.error)
+    messageApi.sendTyping(conversation.id, false, conversation.otherUser.id).catch(console.error)
   }, 1500)
 
   function handleInputChange(value: string) {
@@ -135,49 +108,52 @@ export default function ChatWindow({ conversation, onBack, isTyping, incomingMes
     setHasMore(res.data.length === 30)
   }
 
-  // Index of my most recent message — the only one that shows the status label.
   let lastOwnIndex = -1
   for (let i = messages.length - 1; i >= 0; i--) {
-    if (messages[i].senderId === currentUserId) {
-      lastOwnIndex = i
-      break
-    }
+    if (messages[i].senderId === currentUserId) { lastOwnIndex = i; break }
   }
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 border-b px-4 py-3">
+      {/* Header */}
+      <div className="flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur">
         {onBack && (
-          <Button variant="ghost" size="icon" className="shrink-0 md:hidden" onClick={onBack}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 md:hidden" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
         )}
-        <Link to={`/u/${conversation.otherUser.id}`} className="flex items-center gap-2.5">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback>{conversation.otherUser.name[0]?.toUpperCase()}</AvatarFallback>
+        <Link to={`/u/${conversation.otherUser.id}`} className="flex min-w-0 flex-1 items-center gap-2.5">
+          <Avatar className="h-8 w-8 shrink-0">
+            <AvatarFallback className="text-xs font-medium">{conversation.otherUser.name[0]?.toUpperCase()}</AvatarFallback>
             <AvatarImage src={conversation.otherUser.profileImage ?? undefined} />
           </Avatar>
-          <div>
-            <p className="text-sm font-semibold leading-tight">{conversation.otherUser.name}</p>
-            {isTyping && <p className="text-xs text-muted-foreground">typing...</p>}
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold leading-tight text-foreground">
+              {conversation.otherUser.name}
+            </p>
+            {isTyping && (
+              <p className="text-[11px] text-teal-600 dark:text-teal-400">typing…</p>
+            )}
           </div>
         </Link>
       </div>
 
-      {/* Fix: remove `ref` from ScrollArea — it doesn't forward refs */}
-      <ScrollArea className="flex-1 min-h-0 px-4 py-3">
+      {/* Messages */}
+      <ScrollArea className="min-h-0 flex-1 px-4 py-4">
         {hasMore && !loading && (
-          <Button variant="ghost" size="sm" className="mb-3 w-full text-xs" onClick={loadMore}>
+          <button
+            onClick={loadMore}
+            className="mb-4 flex w-full items-center justify-center text-xs text-muted-foreground hover:text-foreground"
+          >
             Load older messages
-          </Button>
+          </button>
         )}
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           {messages.map((msg, i) => {
             const isMine = msg.senderId === currentUserId
             const next = messages[i + 1]
             const showTime = !next || next.senderId !== msg.senderId
-            // Show the Sent/Delivered/Seen label only under my most recent message.
             const showStatus = isMine && i === lastOwnIndex
             return (
               <MessageBubble
@@ -194,25 +170,35 @@ export default function ChatWindow({ conversation, onBack, isTyping, incomingMes
         </div>
       </ScrollArea>
 
-      <div className="border-t p-3">
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder="Message..."
+      {/* Input bar */}
+      <div className="shrink-0 border-t bg-background px-4 py-3">
+        <div className="flex items-center gap-2.5 rounded-full border bg-muted/30 pl-4 pr-1.5 py-1.5 focus-within:border-teal-400/60 focus-within:bg-background transition-colors">
+          <input
+            placeholder="Message…"
             value={input}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-            className="flex-1 rounded-full"
+            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
           />
           <Button
             size="icon"
-            className="h-9 w-9 shrink-0 rounded-full"
             onClick={handleSend}
             disabled={!input.trim() || sending}
+            className={cn(
+              "h-7 w-7 shrink-0 rounded-full transition-all",
+              input.trim()
+                ? "bg-teal-600 text-white hover:bg-teal-700 dark:bg-teal-600 dark:hover:bg-teal-500"
+                : "bg-muted text-muted-foreground"
+            )}
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
     </div>
   )
+}
+
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(" ")
 }

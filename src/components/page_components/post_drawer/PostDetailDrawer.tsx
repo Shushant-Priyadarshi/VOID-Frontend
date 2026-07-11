@@ -6,7 +6,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { postApi } from "@/api/post.api"
 import { usePostDrawer } from "@/hooks/usePostDrawer"
@@ -14,6 +13,7 @@ import PostCard from "@/components/page_components/home_page/PostCard"
 import CommentItem from "./CommentItem"
 import CommentComposer from "./CommentComposer"
 import type { Post, Comment } from "@/types"
+import { MessageCircle } from "lucide-react"
 
 export default function PostDetailDrawer() {
   const { openPostId, closePost } = usePostDrawer()
@@ -56,21 +56,13 @@ export default function PostDetailDrawer() {
   function handleLikeToggle(postId: string) {
     setPost((prev) =>
       prev && prev.id === postId
-        ? {
-            ...prev,
-            likedByMe: !prev.likedByMe,
-            likeCount: prev.likedByMe ? prev.likeCount - 1 : prev.likeCount + 1,
-          }
+        ? { ...prev, likedByMe: !prev.likedByMe, likeCount: prev.likedByMe ? prev.likeCount - 1 : prev.likeCount + 1 }
         : prev
     )
     postApi.toggleLike(postId).catch(() => {
       setPost((prev) =>
         prev && prev.id === postId
-          ? {
-              ...prev,
-              likedByMe: !prev.likedByMe,
-              likeCount: prev.likedByMe ? prev.likeCount - 1 : prev.likeCount + 1,
-            }
+          ? { ...prev, likedByMe: !prev.likedByMe, likeCount: prev.likedByMe ? prev.likeCount - 1 : prev.likeCount + 1 }
           : prev
       )
     })
@@ -86,47 +78,77 @@ export default function PostDetailDrawer() {
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && closePost()}>
-      <DrawerContent className="mx-auto h-[92vh] max-w-2xl">
+      <DrawerContent className="mx-auto h-[92vh] max-w-2xl focus:outline-none">
         <DrawerHeader className="sr-only">
           <DrawerTitle>{post?.title ?? "Post"}</DrawerTitle>
         </DrawerHeader>
 
-        <ScrollArea className="flex-1 overflow-auto px-4 pb-8">
+        <ScrollArea className="flex-1 overflow-auto">
           {loading && (
-            <div className="flex flex-col gap-3 py-4">
-              <Skeleton className="h-40 w-full rounded-lg" />
-              <Skeleton className="h-8 w-full rounded-lg" />
-              <Skeleton className="h-8 w-3/4 rounded-lg" />
+            <div className="flex flex-col gap-3 p-4">
+              <div className="rounded-xl border bg-card p-4">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+                  <div className="flex flex-1 flex-col gap-1.5 pt-0.5">
+                    <Skeleton className="h-3.5 w-28 rounded" />
+                    <Skeleton className="h-3 w-16 rounded" />
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-col gap-2">
+                  <Skeleton className="h-4 w-3/4 rounded" />
+                  <Skeleton className="h-3.5 w-full rounded" />
+                  <Skeleton className="h-3.5 w-5/6 rounded" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 px-1">
+                <Skeleton className="h-8 w-full rounded-lg" />
+                <Skeleton className="h-8 w-3/4 rounded-lg" />
+              </div>
             </div>
           )}
 
           {error && (
-            <p className="py-4 text-center text-sm text-destructive">{error}</p>
+            <div className="p-6 text-center">
+              <p className="text-sm text-destructive">{error}</p>
+            </div>
           )}
 
           {!loading && post && (
-            <div className="flex flex-col gap-4 py-2">
-              <PostCard post={post} onLikeToggle={handleLikeToggle} truncate={false} />
+            <div className="flex flex-col pb-10">
+              {/* Post */}
+              <div className="p-4">
+                <PostCard post={post} onLikeToggle={handleLikeToggle} truncate={false} />
+              </div>
 
-              <Separator />
-
-              <div>
-                <h2 className="mb-3 text-sm font-semibold">
-                  Comments {comments.length > 0 && `(${comments.length})`}
-                </h2>
+              {/* Comments section */}
+              <div className="border-t border-border/60 px-4 pt-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold text-foreground">
+                    {comments.length > 0 ? `${comments.length} comment${comments.length === 1 ? "" : "s"}` : "Comments"}
+                  </h2>
+                </div>
 
                 <CommentComposer postId={post.id} onSubmitted={handleTopLevelComment} />
 
-                <div className="mt-4 flex flex-col">
-                  {comments.map((comment) => (
-                    <CommentItem
-                      key={comment.id}
-                      comment={comment}
-                      postId={post.id}
-                      onReplyAdded={handleReplyAdded}
-                    />
-                  ))}
-                </div>
+                {comments.length > 0 ? (
+                  <div className="mt-4 flex flex-col gap-0.5">
+                    {comments.map((comment) => (
+                      <CommentItem
+                        key={comment.id}
+                        comment={comment}
+                        postId={post.id}
+                        onReplyAdded={handleReplyAdded}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center">
+                    <p className="text-xs text-muted-foreground">
+                      No comments yet. Be the first to share your thoughts.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}

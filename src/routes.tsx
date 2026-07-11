@@ -20,6 +20,7 @@ import Notifications from "./pages/Notifications";
 
 export const router = createBrowserRouter([
   {
+    //add /privicy, /terms and *
     element: <AppLayout />,
     children: [
       // public — viewable by anyone
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
   },
 
   // auth pages — no shell, redirect away if already logged in
+  
   {
     element: <RedirectIfAuthed />,
     children: [

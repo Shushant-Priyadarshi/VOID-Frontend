@@ -2,7 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { formatRelativeTime } from "@/lib/formatRelativeTime"
 import type { Conversation } from "@/types"
-import { Check, CheckCheck } from "lucide-react"
+import { Check, CheckCheck, MessageSquare } from "lucide-react"
+import { motion, useReducedMotion } from "framer-motion"
+import { listVariants, itemVariants } from "@/lib/animations"
 
 interface Props {
   conversations: Conversation[]
@@ -11,80 +13,98 @@ interface Props {
   onSelect: (conv: Conversation) => void
 }
 
-function MessageStatusIcon({ status, isMine }: { status: string; isMine: boolean }) {
+function StatusIcon({ status, isMine }: { status: string; isMine: boolean }) {
   if (!isMine) return null
-  if (status === "READ") return <CheckCheck className="h-3.5 w-3.5 text-primary" />
-  if (status === "DELIVERED") return <CheckCheck className="h-3.5 w-3.5 text-muted-foreground" />
-  return <Check className="h-3.5 w-3.5 text-muted-foreground" />
+  if (status === "READ") return <CheckCheck className="h-3 w-3 text-teal-500" />
+  if (status === "DELIVERED") return <CheckCheck className="h-3 w-3 text-muted-foreground/60" />
+  return <Check className="h-3 w-3 text-muted-foreground/60" />
 }
 
 export default function ConversationList({ conversations, activeId, currentUserId, onSelect }: Props) {
+  const shouldReduce = useReducedMotion()
+
   if (conversations.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-        <p className="text-sm font-medium">No messages yet</p>
-        <p className="text-xs text-muted-foreground">
-          Visit someone's profile and hit Message to start a conversation.
-        </p>
+      <div className="flex flex-col items-center gap-3 py-16 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <MessageSquare className="h-5 w-5 text-muted-foreground/40" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-foreground">No messages yet</p>
+          <p className="max-w-[180px] text-xs text-muted-foreground">
+            Visit someone's profile and tap Message to start.
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col">
+    <motion.div
+      variants={shouldReduce ? {} : listVariants}
+      initial="initial"
+      animate="animate"
+      className="flex flex-col py-1"
+    >
       {conversations.map((conv) => {
         const isActive = conv.id === activeId
         const isMine = conv.lastMessage?.senderId === currentUserId
         const hasUnread = conv.unreadCount > 0 && !isMine
 
         return (
-          <button
+          <motion.button
             key={conv.id}
+            variants={shouldReduce ? {} : itemVariants}
             onClick={() => onSelect(conv)}
             className={cn(
-              "flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent",
-              isActive && "bg-accent"
+              "relative flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50",
+              isActive && "bg-muted/60"
             )}
           >
+            {/* Active indicator */}
+            {isActive && (
+              <div className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-teal-500" />
+            )}
+
             <Avatar className="h-11 w-11 shrink-0">
               <AvatarImage src={conv.otherUser.profileImage ?? undefined} />
-              <AvatarFallback>{conv.otherUser.name[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarFallback className="text-sm font-medium">
+                {conv.otherUser.name[0]?.toUpperCase()}
+              </AvatarFallback>
             </Avatar>
 
             <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between">
-                <p className={cn("truncate text-sm", hasUnread ? "font-semibold" : "font-medium")}>
+              <div className="flex items-baseline justify-between gap-2">
+                <p className={cn(
+                  "truncate text-sm",
+                  hasUnread ? "font-semibold text-foreground" : "font-medium text-foreground/90"
+                )}>
                   {conv.otherUser.name}
                 </p>
-                <span className="ml-2 shrink-0 text-[11px] text-muted-foreground">
+                <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground/60">
                   {formatRelativeTime(conv.lastMessageAt)}
                 </span>
               </div>
 
-              <div className="flex items-center gap-1">
-                <MessageStatusIcon
-                  status={conv.lastMessage?.status ?? "SENT"}
-                  isMine={isMine}
-                />
-                <p
-                  className={cn(
-                    "truncate text-xs",
-                    hasUnread ? "font-semibold text-foreground" : "text-muted-foreground"
-                  )}
-                >
-                  {isMine ? "You: " : ""}
+              <div className="mt-0.5 flex items-center gap-1.5">
+                <StatusIcon status={conv.lastMessage?.status ?? "SENT"} isMine={isMine} />
+                <p className={cn(
+                  "truncate text-xs",
+                  hasUnread ? "font-medium text-foreground" : "text-muted-foreground/70"
+                )}>
+                  {isMine ? <span className="text-muted-foreground/60">You: </span> : null}
                   {conv.lastMessagePreview ?? "Start a conversation"}
                 </p>
                 {hasUnread && (
-                  <span className="ml-auto shrink-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-                    {conv.unreadCount}
+                  <span className="ml-auto shrink-0 flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-teal-600 px-1 text-[9px] font-bold text-white">
+                    {conv.unreadCount > 99 ? "99+" : conv.unreadCount}
                   </span>
                 )}
               </div>
             </div>
-          </button>
+          </motion.button>
         )
       })}
-    </div>
+    </motion.div>
   )
 }
