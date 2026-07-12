@@ -14,9 +14,12 @@ import ResetPassword from "./pages/ResetPassword";
 import EmailVerificationSent from "./pages/EmailVerificationSent";
 import EmailVerified from "./pages/EmailVerified";
 import Profile from "./pages/Profile";
-import PublicProfile from "@/pages/PublicProfile"
-import MentorProfilePage from "@/pages/MentorProfile"
+import PublicProfile from "@/pages/PublicProfile";
+import MentorProfile from "@/pages/MentorProfile";
 import Notifications from "./pages/Notifications";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import NotFound from "./pages/NotFound";
 
 export const router = createBrowserRouter([
   {
@@ -28,8 +31,7 @@ export const router = createBrowserRouter([
       { path: "/search", element: <Search /> },
       { path: "/mentor-find", element: <Mentor /> },
       { path: "/u/:id", element: <PublicProfile /> },
-      { path: "/mentor-find/:userId", element: <MentorProfilePage /> },
-      
+      { path: "/mentor-find/:userId", element: <MentorProfile /> },
 
       // requires auth
       {
@@ -45,7 +47,7 @@ export const router = createBrowserRouter([
   },
 
   // auth pages — no shell, redirect away if already logged in
-  
+
   {
     element: <RedirectIfAuthed />,
     children: [
@@ -57,4 +59,11 @@ export const router = createBrowserRouter([
       { path: "/email-verified", element: <EmailVerified /> },
     ],
   },
+
+  // Standalone pages — no shell, no auth redirect
+  { path: "/terms", element: <Terms /> },
+  { path: "/privacy", element: <Privacy /> },
+
+  // Catch-all 404 — must be last
+  { path: "*", element: <NotFound /> },
 ]);

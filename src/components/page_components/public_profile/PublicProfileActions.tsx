@@ -24,7 +24,6 @@ export default function PublicProfileActions({ userId, counts, onFollowChange }:
       setLoading(true)
       try {
         const res = await messageApi.getOrCreateConversation(userId)
-        // Navigate to messages page — the conversation will be selected there
         navigate(`/message?conv=${res.data.id}`)
       } finally {
         setLoading(false)
@@ -36,16 +35,12 @@ export default function PublicProfileActions({ userId, counts, onFollowChange }:
     <>
       <div className="flex items-center gap-2">
         {counts && (
-          <FollowButton
-            userId={userId}
-            initialIsFollowing={counts.isFollowing}
-            onChange={onFollowChange}
-          />
+          <FollowButton userId={userId} initialIsFollowing={counts.isFollowing} onChange={onFollowChange} />
         )}
         <Button
           variant="outline"
           size="sm"
-          className="gap-1.5"
+          className="gap-1.5 border-border/60 text-xs"
           onClick={handleMessage}
           disabled={loading}
         >

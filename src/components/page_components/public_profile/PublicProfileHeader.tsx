@@ -1,47 +1,49 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { GraduationCap, Hospital } from "lucide-react"
+
+import { GraduationCap, Building2 } from "lucide-react"
+import { cn } from "@/lib/utils"
 import type { PublicUserProfile } from "@/types"
 
 interface Props {
   profile: PublicUserProfile
 }
 
+const roleBadgeStyle: Record<string, string> = {
+  MENTOR: "bg-teal-50 text-teal-700 border border-teal-200 dark:bg-teal-950/40 dark:text-teal-400 dark:border-teal-800/60",
+  ADMIN: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
+  USER: "bg-transparent text-muted-foreground border border-border/60",
+}
+
 export default function PublicProfileHeader({ profile }: Props) {
   return (
-    <div className="flex flex-col items-center gap-3 border-b pb-6 pt-2 text-center">
-      <Avatar className="h-20 w-20">
-        <AvatarImage src={profile.profileImage ?? undefined} />
-        <AvatarFallback className="text-xl">
-          {profile.name?.[0]?.toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-
-      <div>
-        <h1 className="text-lg font-semibold">{profile.name}</h1>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <h1 className="text-lg font-bold tracking-tight text-foreground">{profile.name}</h1>
+        <span className={cn(
+          "rounded-full px-2 py-0.5 text-[10px] font-medium capitalize border",
+          roleBadgeStyle[profile.role] ?? roleBadgeStyle.USER
+        )}>
+          {profile.role.charAt(0) + profile.role.slice(1).toLowerCase()}
+        </span>
       </div>
 
       {profile.bio && (
-        <p className="max-w-sm text-sm text-muted-foreground">{profile.bio}</p>
+        <p className="text-sm leading-relaxed text-foreground/80">{profile.bio}</p>
       )}
 
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        <Badge variant="secondary">{profile.role}</Badge>
-
-        {profile.college && (
-          <Badge variant="outline" className="gap-1">
-            <GraduationCap className="h-3 w-3" />
-            {profile.college}
-          </Badge>
-        )}
-
-        {profile.hospital && (
-          <Badge variant="outline" className="gap-1">
-            <Hospital className="h-3 w-3" />
-            {profile.hospital}
-          </Badge>
-        )}
-      </div>
+      {(profile.college || profile.hospital) && (
+        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+          {profile.college && (
+            <span className="flex items-center gap-1.5">
+              <GraduationCap className="h-3.5 w-3.5" /> {profile.college}
+            </span>
+          )}
+          {profile.hospital && (
+            <span className="flex items-center gap-1.5">
+              <Building2 className="h-3.5 w-3.5" /> {profile.hospital}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   )
 }
