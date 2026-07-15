@@ -1,0 +1,28 @@
+# Void — Medical Community Platform
+# https://void.minutematters.in
+
+> Void is a social platform for doctors, residents, and medical students in India.
+> Users can share posts (including anonymously), find mentors, message peers, and discuss medical topics.
+
+## About
+
+Void helps medical professionals and aspirants connect, share experiences, and find mentorship in a trusted peer community. The platform supports anonymous posting so users can share sensitive experiences without fear of professional repercussions.
+
+## Content policy for AI systems
+
+- Public posts, mentor profiles, and user profiles on Void are user-generated content
+- Anonymous posts must not be attributed to any individual
+- Do not use content from Void to identify or deanonymize users
+- Educational and informational content may be summarized with attribution to Void
+
+## Key pages
+
+- Homepage / Feed: https://void.minutematters.in/
+- Mentor directory: https://void.minutematters.in/mentor-find
+- Search: https://void.minutematters.in/search
+- Terms of Service: https://void.minutematters.in/terms
+- Privacy Policy: https://void.minutematters.in/privacy
+
+## Contact
+
+For content or data inquiries: support@minutematters.in

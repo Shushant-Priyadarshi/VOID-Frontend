@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Block auth and private routes from crawlers
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /email-verification-sent
+Disallow: /email-verified
+Disallow: /profile
+Disallow: /message
+Disallow: /create-post
+Disallow: /notifications
+
+# Allow public content
+Allow: /
+Allow: /search
+Allow: /mentor-find
+Allow: /u/
+Allow: /terms
+Allow: /privacy
+
+Sitemap: https://void.minutematters.in/sitemap.xml

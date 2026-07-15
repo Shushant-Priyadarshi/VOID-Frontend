@@ -78,7 +78,7 @@ export default function PostDetailDrawer() {
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && closePost()}>
-      <DrawerContent className="mx-auto h-[92vh] max-w-2xl focus:outline-none">
+      <DrawerContent className="mx-auto h-[92vh] max-w-4xl focus:outline-none">
         <DrawerHeader className="sr-only">
           <DrawerTitle>{post?.title ?? "Post"}</DrawerTitle>
         </DrawerHeader>

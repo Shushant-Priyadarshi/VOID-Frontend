@@ -77,7 +77,7 @@ export default function CreatePost() {
         )}>
           <div className="flex flex-col gap-0 divide-y divide-border/60">
             {/* Title */}
-            <div className="px-4 py-3">
+            <div className="px-6 py-3">
               <input
                 id="title"
                 value={title}
